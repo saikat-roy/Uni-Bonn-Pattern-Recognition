@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     # read height and weight data into 2D array (i.e. into a matrix)
     X = data[:,0:2].astype(np.float)
-
+    print(X)
     # read gender data into 1D array (i.e. into a vector)
     y = data[:,2]
     
@@ -81,3 +81,6 @@ if __name__ == "__main__":
 
     # third, plot this new representation of the data
     plotData2D(Z, 'plotHW.pdf')
+
+    # Solution to Question 1.1: Plot the data after excluding the missing weight values
+    plotData2D(X[:,X[0,:]>=0], 'plotWH_nonegatives.pdf')
