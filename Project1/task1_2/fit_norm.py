@@ -9,7 +9,6 @@ if __name__ == "__main__":
 
     # read height data into 2D array (i.e. into a matrix)
     X = data[:, 1].astype(np.float)
-    print(X)
 
     # Sample mean and std enough to parameterize a normal distribution
     mean = np.mean(X)

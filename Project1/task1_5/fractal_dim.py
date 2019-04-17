@@ -32,15 +32,15 @@ def calc_fractal_dim(g):
     chk = lambda x_block: 1 if np.sum(x_block)>1 else 0
 
     # provides a list of non-overlapping blocks of side length (s_i*h, s_i*w) from g
-    blocks = lambda s_i: [g[i:min(h,i+int(s_i*h)), j:min(w,j+int(s_i*w))] for i in range(0,h,int(s_i*h))
+    blocks = lambda s_i: [g[i:min(h,i+int(s_i*h)), j:min(w,j+int(s_i*w))] for i in range(0,h,int(s_i*h))\
                                                                         for j in range(0,w,int(s_i*w))]
 
     # calculating the number of blocks with non-zero elements for all scaling factors in s_i
     n = [sum([chk(b) for b in blocks(s_i)]) for s_i in S]
 
     # Mapping n and S to x-y values for final line-fitting
-    y = list(map(math.log2,n))
-    x = list(map(lambda s_i:math.log2(1/s_i), S))
+    y = list(map(math.log,n))
+    x = list(map(lambda s_i:math.log(1/s_i), S))
 
     # Fitting a degree 1 polynomial to x and y
     p = np.polyfit(x, y, deg=1) # Highest power first

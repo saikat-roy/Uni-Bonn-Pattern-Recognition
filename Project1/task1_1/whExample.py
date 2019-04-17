@@ -61,7 +61,6 @@ if __name__ == "__main__":
 
     # read height and weight data into 2D array (i.e. into a matrix)
     X = data[:,0:2].astype(np.float)
-    print(X)
     # read gender data into 1D array (i.e. into a vector)
     y = data[:,2]
     
