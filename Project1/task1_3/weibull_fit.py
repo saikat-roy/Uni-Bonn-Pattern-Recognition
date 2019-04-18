@@ -24,7 +24,7 @@ class Weibull:
                 term4 += ((D[i]/self.k_alp[1])**self.k_alp[0])*((math.log(D[i]/self.k_alp[1])**2))
             print(term1,term2,term3,term4)
 
-            dL_dk = (N / self.k_alp[0]) - (N * math.log(self.k_alp[0])) + term1 - term2
+            dL_dk = (N / self.k_alp[0]) - (N * math.log(self.k_alp[1])) + term1 - term2
             dL_dalpha = self.k_alp[0] / self.k_alp[1] * (term3 - N)
             d2L_dk2 = -(N / (self.k_alp[0] ** 2)) - term4
             d2L_dalpha2 = (self.k_alp[0] / (self.k_alp[1] ** 2)) * (N - ((self.k_alp[0]+1)*term3))
@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
     #weib = Weibull(kappa=2.81, alpha=215.43)
     weib = Weibull()
-    # weib.fit(D)
-    weib.fit_hist(h)
+    weib.fit(D)
+    # weib.fit_hist(h)
 
     x = np.linspace(1, X.shape[0], 1000)  # 1000 evenly spaced numbers over xmin and xmax for plotting normal distribution
     p = weib.pred(x)  # specify a normal distribution for sample mean and std
