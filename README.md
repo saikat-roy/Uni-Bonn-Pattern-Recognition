@@ -1,4 +1,4 @@
-# Uni-Bonn-Pattern-Recognition
+# University of Bonn: Pattern Recognition SS2019
 Code from the Pattern Recognition project at University of Bonn (SS19)
 
 ## Welcome
