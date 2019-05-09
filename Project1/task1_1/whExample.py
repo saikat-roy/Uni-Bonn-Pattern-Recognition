@@ -82,4 +82,10 @@ if __name__ == "__main__":
     plotData2D(Z, 'plotHW.pdf')
 
     # Solution to Question 1.1: Plot the data after excluding the missing weight values
-    plotData2D(X[:,X[0,:]>=0], 'plotWH_nonegatives.pdf')
+    #Passing data only if both measurements are positive
+
+    #Plot weight vs height
+    plotData2D(X[:,np.argwhere(np.all(X[..., :] >= 0, axis = 0))], 'plotWH_nonegatives.pdf')
+
+    #Plot height vs weight
+    plotData2D(Z[:, np.argwhere(np.all(Z[..., :] >= 0, axis=0))], 'plotHW_nonegatives.pdf')
