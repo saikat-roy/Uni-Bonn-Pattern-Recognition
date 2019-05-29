@@ -84,24 +84,19 @@ if __name__ == "__main__":
             for j in range(n+1):
                 x=h[i]
                 X1[i][j] = pow(x,j)
-        #print(X1)
+        print(X1)
         return X1
-    X1 = get_matrices(w,h,1)
+    X1 = get_matrices(w,h,10)
     X1 = np.mat(X1)
     inter1 = X1.transpose() * X1
     #print(inter1)
-    inter2 = np.linalg.inv(inter1)
+    inter2 = np.linalg.pinv(inter1)
+    #id = np.identity(11)
+    #inter2 = np.linalg.solve(inter1,id)
     inter3 = np.mat(inter2) * np.mat(X1.transpose())
     W = np.mat(inter3) * np.mat(w).transpose()
     #print(W)
 
-
-    def predict(h,W):
-        y=[]
-        for i in range(len(h)):
-            y1 = W[0] + h[i]*W[1]
-            y.append(y1)
-        return y
 
 
     def fn(h, W):
