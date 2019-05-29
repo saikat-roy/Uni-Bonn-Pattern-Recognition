@@ -21,7 +21,7 @@ class BayesianPoly():
 
     def fit(self, X, y):
 
-        print(X, y)
+        # print(X, y)
         X = self.preprocess_X(X)
         y = self.preprocess_y(y)
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     plt.scatter(X, y, color='black', label='Data')
 
-    print(X.shape, y.shape)
+    # print(X.shape, y.shape)
 
     model = BayesianPoly(reg_order=5, sigma_0_sq=3)
     model.fit(X, y)
