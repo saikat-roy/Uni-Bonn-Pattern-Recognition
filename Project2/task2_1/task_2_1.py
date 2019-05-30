@@ -77,6 +77,9 @@ if __name__ == "__main__":
     w = w[w>=0]
     #print(len(w))
     row=[]
+
+
+
     def get_matrices(w,h,n):
         X1 = np.zeros((len(h),n+1))
         #print(X)
@@ -86,14 +89,18 @@ if __name__ == "__main__":
                 X1[i][j] = pow(x,j)
         print(X1)
         return X1
-    X1 = get_matrices(w,h,10)
+    X1 = get_matrices(w,h,1)
     X1 = np.mat(X1)
-    inter1 = X1.transpose() * X1
+    X1_mu = np.mean(X1,axis=1)
+    X1_sigma = np.std(X1,axis=1)
+    ztrans_X1 = ((X1 - X1_mu)/ (X1_sigma + 1e-8))
+    ztrans_X1[0,:] = 1.0
+    inter1 = ztrans_X1.transpose() * ztrans_X1
     #print(inter1)
     inter2 = np.linalg.pinv(inter1)
     #id = np.identity(11)
     #inter2 = np.linalg.solve(inter1,id)
-    inter3 = np.mat(inter2) * np.mat(X1.transpose())
+    inter3 = np.mat(inter2) * np.mat(ztrans_X1.transpose())
     W = np.mat(inter3) * np.mat(w).transpose()
     #print(W)
 
