@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.linalg import inv, norm
+from numpy.linalg import pinv, inv, norm
 import matplotlib.pyplot as plt
 
 
@@ -31,8 +31,15 @@ class BayesianPoly():
         # Fitting the weights of the model using MAP
         self.W_map = np.dot(np.dot(inv(np.dot(X, X.T) + (np.identity(X.shape[0])*(self.y_sigma/self.sigma_0_sq)**2)),X),y)
 
-        # STILL NOT WORKING PROPERLY FOR SOME REASON
-        self.W_mle = np.dot(np.dot(inv(np.dot(X, X.T)), X), y)
+        # Z-transform of data for MLE fit
+        self.X_mu = np.mean(X, axis=1)
+        self.X_sigma = np.std(X, axis=1)
+
+        ztrans_X = ((X.T-self.X_mu)/(self.X_sigma+1e-8)).T
+        ztrans_X[0,:] = 1.0 # Reinitializing w_0
+
+        # Fitting the weights of the model using MLE
+        self.W_mle = np.dot(np.dot(inv(np.dot(ztrans_X, ztrans_X.T)), ztrans_X), y)
 
         # Used only for predictive distribution estimation (NOT IMPLEMENTED CURRENTLY)
         self.chi = (np.dot(X, X.T)/(self.y_sigma**2)) + (np.identity(X.shape[0])/self.sigma_0_sq)
@@ -45,7 +52,10 @@ class BayesianPoly():
         if w_type == 'map':
             y = np.dot(self.W_map.T, X).reshape(X.shape[1])
         elif w_type == 'mle':
-            y = np.dot(self.W_mle.T, X).reshape(X.shape[1])
+            ztrans_X = ((X.T - self.X_mu) / (self.X_sigma+1e-8)).T
+            ztrans_X[0, :] = 1.0
+            # ztrans_X = np.log1p(X)
+            y = np.dot(self.W_mle.T, ztrans_X).reshape(ztrans_X.shape[1])
         return y
 
     def evaluate_dist(self, X):
@@ -128,16 +138,16 @@ if __name__ == "__main__":
     Y_plot = model.evaluate(X_plot, w_type='map')
     plt.plot(X_plot, Y_plot, 'k', linewidth=2, color='red', label='MAP') # Plot the gaussian
 
-    # Y_plot = model.evaluate(X_plot, w_type='mle')
-    # plt.plot(X_plot, Y_plot, 'k', linewidth=2, color='green', label='MLE')  # Plot the gaussian
+    Y_plot = model.evaluate(X_plot, w_type='mle')
+    plt.plot(X_plot, Y_plot, 'k', linewidth=2, color='green', label='MLE')  # Plot the gaussian
 
     title = "Bayesian Regression Fit to: Height vs Weight"
     plt.title(title)
-    #plt.ylim(50,120)
+    plt.ylim(40,100)
     plt.legend()
     plt.savefig("bayesian_regr.pdf", facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
                 bbox_inches='tight', pad_inches=0.1)
     plt.show()
     print("MSE for MAP estimation = {}".format(mse(model.evaluate(X, w_type='map'),y)))
-    # print("MSE for MLE estimation = {}".format(mse(model.evaluate(X, w_type='mle'), y)))
+    print("MSE for MLE estimation = {}".format(mse(model.evaluate(X, w_type='mle'), y)))
