@@ -100,7 +100,7 @@ if __name__ == "__main__":
     inter2 = np.linalg.pinv(inter1)
     #id = np.identity(11)
     #inter2 = np.linalg.solve(inter1,id)
-    inter3 = np.mat(inter2) * np.mat(ztrans_X1.transpose())
+    inter3 = np.mat(inter2) * np.mat(X1.transpose())
     W = np.mat(inter3) * np.mat(w).transpose()
     #print(W)
 
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     plt.scatter(h, w, color='blue')
     plt.plot(h, np.squeeze(np.asarray(px)), color='red')
     plt.title('Weight')
-    plt.xlabel('')
-    plt.ylabel('Height')
+    plt.xlabel('Height')
+    plt.ylabel('Weight')
 
     plt.show()
