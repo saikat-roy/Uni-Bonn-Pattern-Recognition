@@ -96,6 +96,7 @@ class KDTree:
         plt.xlim((xmin, xmax))
         plt.ylim((ymin, ymax))
         self._plot(self.root, ax, xmin, xmax, ymin, ymax)
+        plt.title("kD-Tree for Split Point Selection: {} \n Split Dim. selection: {}".format(self.split_mode, self.dim_mode))
         plt.show()
 
     def _plot(self, node, ax, xmin, xmax, ymin, ymax):
@@ -142,16 +143,10 @@ if __name__ == "__main__":
     X = d[:,0:2]
     Y = d[:,2]
     Y[Y==-1] = 0
-    # color_list = ['blue','red']
-    # # color_list = ['gray','black']
-    # #print(Y)
-    #
-    # plt.scatter(X[:,0], X[:,1], c=Y, cmap=ListedColormap(color_list), alpha=0.75)
-    # plt.xlim((min(X[:, 0]), max(X[:, 0])))
-    # plt.ylim((min(X[:, 1]), max(X[:, 1])))
-    # plt.show()
 
+    split_mode = ["mid", "median"]
+    dim_mode = ["alternate", "var"]
 
-    model = KDTree(k=2)
-    model.fit(x=X, y=Y, depth=5)
+    model = KDTree(k=2, split_mode="mid", dim_mode="alternate")
+    model.fit(x=X, y=Y, depth=None)
     model.plot()
