@@ -11,7 +11,7 @@ def standardize( data):
     """
     global  mu, std
     mu = np.mean(data, axis=0)
-    std = np.mean(data, axis=0)
+    std = np.std(data, axis=0)
     data = (data - mu) / (std+1e-8)
     data[:,0] = 1.0
     return data
