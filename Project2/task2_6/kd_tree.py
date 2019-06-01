@@ -18,6 +18,7 @@ class KDTree:
         self.depth = None
         self.dim_mode = dim_mode
         self.split_mode = split_mode
+        self.max_depth = 0
 
     def fit(self, x, y, depth=None):
         """
@@ -35,6 +36,9 @@ class KDTree:
         self.root = self._fit(idxs=idxs, depth=0, last_dim=None)
 
     def _fit(self, idxs, depth, last_dim = None):
+
+        if depth>self.max_depth:
+            self.max_depth = depth
 
         if self.depth is not None:
             if depth==self.depth:
@@ -188,11 +192,12 @@ if __name__ == "__main__":
     dim_mode = ["alternate", "var"]
 
     t1 = time.time()
-    model = KDTree(k=2, split_mode="median", dim_mode="alternate")
+    model = KDTree(k=2, split_mode="median", dim_mode="var")
     model.fit(x=X, y=Y, depth=None)
     # model.plot()
     t2 = time.time()
     print("Time taken for k-d tree creation: {} secs".format(t2-t1))
+    print('Depth of Tree created: {}'.format(model.max_depth))
 
     with open("data2-test.dat", "r") as f:
         d = np.loadtxt(f)
