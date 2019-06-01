@@ -1,8 +1,11 @@
 import numpy as np
-from numpy import linalg as la
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
+from sklearn.neighbors import KDTree as KDTREE
+
+import time
+
 
 class KDTree:
 
@@ -77,16 +80,43 @@ class KDTree:
 
     def __str__(self):
         raise NotImplementedError
-        print(self.root.val, self.root.k)
 
-    def evaluate(self):
-        return
+    def evaluate(self, X):
+        def f(x):
+            return self._evaluate(x, self.root, best=None, best_idx=None)
+        dists_idxs = np.apply_along_axis(f, axis=1, arr=X)
+        idxs = dists_idxs[:,1]
+        return self.Y[idxs.astype(np.int)]
+
+    def _evaluate(self, x, node, best, best_idx):
+        if node.idxs is not None: # Leaf Node Condition
+            # print(self.X[node.idxs], x)
+            new_best = np.linalg.norm(x-self.X[node.idxs], ord=2)
+            if best is None or best < new_best:
+                best = new_best
+                best_idx = node.idxs
+        else:                     # Intermediate Node Condition
+            if x[node.split_dim]<= node.val: # Fancy way of taking care of initial traversal
+                search_first = 'left'
+            else:
+                search_first = 'right'
+
+            if search_first == 'left':
+                if best == None or (x[node.split_dim]-best<=node.val):
+                    best, best_idx = self._evaluate(x, node.left_node, best, best_idx)
+                elif best == None or (x[node.split_dim]-best>node.val):
+                    best, best_idx = self._evaluate(x, node.right_node, best, best_idx)
+            else:
+                if best == None or (x[node.split_dim]-best>node.val):
+                    best, best_idx = self._evaluate(x, node.right_node, best, best_idx)
+                elif best == None or (x[node.split_dim]-best<=node.val):
+                    best, best_idx = self._evaluate(x, node.left_node, best, best_idx)
+
+        return best, best_idx
 
     def plot(self):
         assert self.k == 2
         color_list = ['blue', 'red']
-        # color_list = ['gray','black']
-        # print(Y)
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -135,6 +165,10 @@ class KDNode:
         self.right_node = None
 
 
+def accuracy(preds, true):
+    return np.sum((preds==true)*1)/preds.shape[0]
+
+
 if __name__ == "__main__":
 
     with open("data2-train.dat", "r") as f:
@@ -143,10 +177,44 @@ if __name__ == "__main__":
     X = d[:,0:2]
     Y = d[:,2]
     Y[Y==-1] = 0
+    print("Number of Samples in training set: {}".format(X.shape[0]))
+
+    t1 = time.time()
+    sklearn_tree = KDTREE(X, leaf_size=2)
+    t2 = time.time()
+    print("Time taken for Sklearn k-d tree creation: {} secs".format(t2-t1))
 
     split_mode = ["mid", "median"]
     dim_mode = ["alternate", "var"]
 
-    model = KDTree(k=2, split_mode="mid", dim_mode="alternate")
+    t1 = time.time()
+    model = KDTree(k=2, split_mode="median", dim_mode="alternate")
     model.fit(x=X, y=Y, depth=None)
-    model.plot()
+    # model.plot()
+    t2 = time.time()
+    print("Time taken for k-d tree creation: {} secs".format(t2-t1))
+
+    with open("data2-test.dat", "r") as f:
+        d = np.loadtxt(f)
+
+    X = d[:,0:2]
+    Y = d[:,2]
+    Y[Y==-1] = 0
+    print("\nNumber of Samples in test set: {}".format(X.shape[0]))
+
+    t1 = time.time()
+    dist, idx = sklearn_tree.query(X)
+    t2 = time.time()
+    sk_preds = model.Y[idx].reshape(idx.shape[0])
+
+    print("Time taken for Sklearn k-d tree querying for 1-NN on data2-test.dat: {} secs".format(t2 - t1))
+
+    t1 = time.time()
+    Y_pred = model.evaluate(X)
+    t2 = time.time()
+    print("Time taken for k-d tree querying for 1-NN on data2-test.dat: {} secs".format(t2 - t1))
+
+    print("\nAccuracy on Test Set for Sklearn KDTree = {}".format(accuracy(sk_preds, Y)))
+    print("Accuracy on Test Set for KDTree = {}".format(accuracy(Y_pred, Y)))
+
+
