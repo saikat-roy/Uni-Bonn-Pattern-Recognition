@@ -1,64 +1,81 @@
 import numpy as np
-import scipy as sp
+from numpy import linalg
 import matplotlib.pyplot as plt
 
+mu = None
+std = None
+def standardize( data):
+    """
+    Peforms standardization (Z-transform) of data and stores mu and std for use during evaluation
+    in global variables
+    """
+    global  mu, std
+    mu = np.mean(data, axis=0)
+    std = np.mean(data, axis=0)
+    data = (data - mu) / (std+1e-8)
+    data[:,0] = 1.0
+    return data
+
+def fit(x,y, order=5):
+    """
+    Fits the data after preprocessing and standardization to a polynomial of degree 'order'.
+    Program is solved using np.linalg.inv
+    """
+    d = {}
+    d['x' + str(0)] = np.ones([1, len(x)],dtype=np.float)[0]
+    for i in np.arange(1, order + 1):
+        d['x' + str(i)] = x ** i
+    X = np.column_stack(d.values())
+    X = standardize(X)
+    inter1 = np.matmul(np.transpose(X), X)
+    #find inverse
+    theta = np.matmul(np.matmul(linalg.inv(inter1), np.transpose(X)), y)
+    return theta
 
 
-if __name__ == "__main__":
-    #######################################################################
-    # 1st alternative for reading multi-typed data from a text file
-    #######################################################################
-    # define type of data to be read and read data from file
-
-    data = np.loadtxt('whData.dat', dtype=np.object, comments='#', delimiter=None)
-    # Removing rows with missing weights
-    data = data[data[:, 0] != '-1', :]
-
-    # read height data into 1D array (i.e. into a matrix)
-    X = data[:, 1].astype(np.float)
-
-    # read weight data into 1D array (i.e. into a vector)
-    y = data[:, 0].astype(np.float)
-
-    plt.scatter(X, y, color='black', label='Data')
-    w=x
-    def get_matrices(w,h,n):
-        X1 = np.zeros((len(h),n+1))
-        #print(X)
-        for i in range(len(h)):
-            for j in range(n+1):
-                x=h[i]
-                X1[i][j] = pow(x,j)
-        print(X1)
-        return X1
-    X1 = get_matrices(w,h,1)
-    X1 = np.mat(X1)
-    X1_mu = np.mean(X1,axis=1)
-    X1_sigma = np.std(X1,axis=1)
-    ztrans_X1 = ((X1 - X1_mu)/ (X1_sigma + 1e-8))
-    ztrans_X1[0,:] = 1.0
-    inter1 = ztrans_X1.transpose() * ztrans_X1
-    #print(inter1)
-    inter2 = np.linalg.inv(inter1)
-    #id = np.identity(11)
-    #inter2 = np.linalg.solve(inter1,id)
-    inter3 = np.mat(inter2) * np.mat(ztrans_X1.transpose())
-    W = np.mat(inter3) * np.mat(w).transpose()
-    #print(W)
+def evaluate(saved_heights,theta):
+    """
+    Performs polynomial regression based on the saved weights after standardizing the data.
+    """
+    py=[]
+    for i in saved_heights:
+        r= theta[0]
+        for j in range(1, len(theta)):
+            r = r + (theta[j] * (pow(i,j)-mu[j])/(std[j]+1e-8))
+        py.append(r)
+    return py
 
 
+data = np.loadtxt('whData.dat', dtype=np.object, comments='#', delimiter=None)
+# Removing rows with missing weights
+saved_row = data[data[:, 0] == '-1', :]
 
-    def fn(h, W):
-        px = 0
-        for index in range(0, np.size(W)):
-            px += (W[index] * (h ** index))  # evaluate the P(x)
-        return px
+data = data[data[:, 0] != '-1', :]
+saved_heights = saved_row[:, 1].astype(np.float)
+# read height data into 1D array (i.e. into a matrix)
+X = data[:, 1].astype(np.float)
 
-    px = fn(h,W)
-    plt.scatter(h, w, color='blue')
-    plt.plot(h, np.squeeze(np.asarray(px)), color='red')
-    plt.title('Weight')
-    plt.xlabel('Height')
-    plt.ylabel('Weight')
+# read weight data into 1D array (i.e. into a vector)
+y = data[:, 0].astype(np.float)
 
-    plt.show()
+theta = fit(X,y)
+h = np.linspace(155,190, 100)
+#plot_predictedPolyLine(h,y,theta)
+
+px = evaluate(h,theta)
+y_missing = evaluate(saved_heights,theta)
+print("Missing Values:\n\n(Heights, Weights)\n----------")
+for i in zip(saved_heights, y_missing):
+    print(i)
+plt.scatter(saved_heights, y_missing, color='black', label='missing')
+plt.scatter(X,y , color='blue', label='data')
+plt.plot(h, px, color='red', label='MLE fit')
+plt.title('Height Vs Weight using MLE')
+plt.ylim((40,100))
+plt.xlabel('Height')
+plt.ylabel('Weight')
+plt.legend()
+plt.savefig("mle_poly_regr.pdf", facecolor='w', edgecolor='w',
+                papertype=None, format='pdf', transparent=False,
+                bbox_inches='tight', pad_inches=0.1)
+plt.show()
