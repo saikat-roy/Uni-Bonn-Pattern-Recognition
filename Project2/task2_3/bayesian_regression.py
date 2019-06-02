@@ -4,9 +4,18 @@ import matplotlib.pyplot as plt
 
 
 class BayesianPoly():
+    """
+    (Well vectorized) implementation of Bayesian polynomial regression. Has a MLE module built-in for comparison.
+    Predictive distribution module currently untested (not needed in prediction).
+    """
 
     def __init__(self, reg_order, sigma_0_sq):
+        """
+        Initializes regression parameters.
 
+        :param reg_order: The order of the regression.
+        :param sigma_0_sq: The std of the prior on the labels
+        """
         self.reg_order = reg_order
         self.sigma_0_sq = sigma_0_sq
         self.sigma = None
@@ -20,10 +29,18 @@ class BayesianPoly():
         self.W_mle = None
 
     def fit(self, X, y):
+        """
+        Trains a MAP (as well as MLE for comparison) on Bayesian Regression. Internally standardizes data before
+        MLE whereas unstandardized works fine for MAP.
 
+        :param X: ndarray of training data
+        :param y: ndarray of training labels
+        :return:
+        """
         # print(X, y)
-        X = self.preprocess_X(X)
-        y = self.preprocess_y(y)
+        # Does some numpy array balancing among other things
+        X = self.preprocess_X(X)    # Creates feature vector for polynomial x -> [1, x, x^2,... x^self.reg_order]
+        y = self.preprocess_y(y)    # Numpy based dimension expansions
 
         if self.y_sigma is None:
             self.y_sigma = np.std(y)
@@ -41,12 +58,18 @@ class BayesianPoly():
         # Fitting the weights of the model using MLE
         self.W_mle = np.dot(np.dot(inv(np.dot(ztrans_X, ztrans_X.T)), ztrans_X), y)
 
-        # Used only for predictive distribution estimation (NOT IMPLEMENTED CURRENTLY)
+        # Used only for predictive distribution estimation (NOT IMPLEMENTED PROPERLY OR TESTED CURRENTLY)
         self.chi = (np.dot(X, X.T)/(self.y_sigma**2)) + (np.identity(X.shape[0])/self.sigma_0_sq)
         self.mu = (np.dot(np.dot(inv(self.chi),X),y)/(self.y_sigma**2))
 
     def evaluate(self, X, w_type='map'):
-
+        """
+        Performs polynomial regression on a test set. Performs standardization if 'mle' results are required for
+        comparison.
+        :param X: ndarray of training data
+        :param w_type: whether to use 'mle' or 'map' weights.
+        :return: ndarray of predictions
+        """
         X = self.preprocess_X(X)
 
         if w_type == 'map':
@@ -60,7 +83,7 @@ class BayesianPoly():
 
     def evaluate_dist(self, X):
         """
-        Does not work properly yet
+        Evaluates the predictive distribution. NOT IMPLEMENTED CURRENTLY
         :param X:
         :return:
         """
@@ -89,12 +112,16 @@ class BayesianPoly():
                 print(x.shape, p_y_XD[0,i])
                 ax.scatter(x[1,0], p_y_XD[0,i]*120)
             y_pred.append(p_y_XD)
-        print(y_pred)
+        # print(y_pred)
         plt.show()
         return p_y_XD
 
     def preprocess_X(self, X):
-
+        """
+        Expands dimensions for data X and Creates the feature vector for polynomial regression
+        :param X: ndarray of input data points
+        :return: ndarray of transformed data points for polynomial regression of order = self.regr_order
+        """
         def f(x):
             return np.array([x[0] ** i for i in range(self.reg_order + 1)])
 
@@ -104,11 +131,22 @@ class BayesianPoly():
         return X
 
     def preprocess_y(self, y):
+        """
+        Does simply numpy based dimension expansion on labels
+        :param y: ndarray of labels
+        :return: ndarray of labels with one extra dimension
+        """
         y = np.expand_dims(y, axis=1)
         return y
 
 
 def mse(y_pred, y_true):
+    """
+    Calculates the mean squared error of the prediction
+    :param y_pred: ndarray of predicted ys
+    :param y_true: ndarray of true ys
+    :return: the mse of the predictions
+    """
     return np.mean((y_pred-y_true)**2)
     # return y_pred-y_true
 
