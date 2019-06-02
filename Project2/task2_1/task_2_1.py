@@ -16,7 +16,7 @@ def standardize( data):
     data[:,0] = 1.0
     return data
 
-def fit(x,y, order=5):
+def fit(x,y, order=1):
     """
     Fits the data after preprocessing and standardization to a polynomial of degree 'order'.
     Program is solved using np.linalg.inv
@@ -58,24 +58,27 @@ X = data[:, 1].astype(np.float)
 # read weight data into 1D array (i.e. into a vector)
 y = data[:, 0].astype(np.float)
 
-theta = fit(X,y)
-h = np.linspace(155,190, 100)
-#plot_predictedPolyLine(h,y,theta)
+d = [1,5,10]
+for i in d:
 
-px = evaluate(h,theta)
-y_missing = evaluate(saved_heights,theta)
-print("Missing Values:\n\n(Heights, Weights)\n----------")
-for i in zip(saved_heights, y_missing):
-    print(i)
-plt.scatter(saved_heights, y_missing, color='black', label='missing')
-plt.scatter(X,y , color='blue', label='data')
-plt.plot(h, px, color='red', label='MLE fit')
-plt.title('Height Vs Weight using MLE')
-plt.ylim((40,100))
-plt.xlabel('Height')
-plt.ylabel('Weight')
-plt.legend()
-plt.savefig("mle_poly_regr.pdf", facecolor='w', edgecolor='w',
-                papertype=None, format='pdf', transparent=False,
-                bbox_inches='tight', pad_inches=0.1)
-plt.show()
+    theta = fit(X,y,i)
+    h = np.linspace(155,200, 100)
+    #plot_predictedPolyLine(h,y,theta)
+
+    px = evaluate(h,theta)
+    y_missing = evaluate(saved_heights,theta)
+    print("\nMissing Values:\n(Heights, Weights for d=",i,")\n----------")
+    for i in zip(saved_heights, y_missing):
+        print(i)
+    plt.scatter(saved_heights, y_missing, color='black', label='missing')
+    plt.scatter(X,y , color='blue', label='data')
+    plt.plot(h, px, color='red', label='MLE fit')
+    plt.title('Height vs Weight using Least Squares Method') 
+    plt.ylim((30,100))
+    plt.xlabel('Height')
+    plt.ylabel('Weight')
+    plt.legend()
+    plt.savefig("mle_poly_regr.pdf", facecolor='w', edgecolor='w',
+                    papertype=None, format='pdf', transparent=False,
+                    bbox_inches='tight', pad_inches=0.1)
+    plt.show()
