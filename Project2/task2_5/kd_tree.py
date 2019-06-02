@@ -174,6 +174,8 @@ class KDTree:
             plt.scatter(self.X[:, 0], self.X[:, 1], color='blue', alpha=0.75)
         plt.xlim((xmin, xmax))
         plt.ylim((ymin, ymax))
+        plt.ylabel("Weight")
+        plt.xlabel("Height")
         self._plot(self.root, ax, xmin, xmax, ymin, ymax)
         plt.title("kD-Tree for Split Point Selection: {} \n Split Dim. selection: {}".format(self.split_mode, self.dim_mode))
         if savefig:
@@ -291,7 +293,7 @@ if __name__ == "__main__":
     print("Number of Samples in training set: {}".format(X.shape[0]))
 
     t1 = time.time()
-    sklearn_tree = KDTREE(X, leaf_size=2)
+    sklearn_tree = KDTREE(X, leaf_size=1)
     t2 = time.time()
     print("Time taken for Sklearn k-d tree creation: {} secs".format(t2-t1))
 

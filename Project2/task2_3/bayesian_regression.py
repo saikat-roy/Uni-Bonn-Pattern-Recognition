@@ -182,6 +182,8 @@ if __name__ == "__main__":
     title = "Bayesian Regression Fit to: Height vs Weight"
     plt.title(title)
     plt.ylim(40,100)
+    plt.ylabel("Weight")
+    plt.xlabel("Height")
     plt.legend()
     plt.savefig("bayesian_regr.pdf", facecolor='w', edgecolor='w',
                 papertype=None, format='pdf', transparent=False,
