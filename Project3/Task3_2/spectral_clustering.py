@@ -30,11 +30,16 @@ if __name__ == "__main__":
 
     fv = v[:,1]
     print(fv)
-    y = (fv<=0)*1
+    y = (fv>0)*1
     print(y)
 
     color_list = ['blue', 'red']
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=ListedColormap(color_list), alpha=0.75)
+    plt.scatter(X[y == 0, 0], X[y == 0, 1], c='blue', label='Class 1', alpha=0.75)
+    plt.scatter(X[y == 1, 0], X[y == 1, 1], c='red', label='Class 2', alpha=0.75)
+    plt.title("Spectral Clustering for 'data-clustering-2.csv'")
+    plt.savefig("spectral_clustering.pdf", facecolor='w', edgecolor='w', papertype=None, format='pdf',
+                transparent=False, bbox_inches='tight', pad_inches=0.1)
+    plt.legend()
     plt.show()
 
     # from sklearn.cluster import KMeans, SpectralClustering
