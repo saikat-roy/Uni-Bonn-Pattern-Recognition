@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.linalg import norm, eig
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 
 if __name__ == "__main__":
 
