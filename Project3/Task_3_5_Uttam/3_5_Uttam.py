@@ -55,16 +55,17 @@ plot_data_and_fit(hgt, wgt, x, y, "Reg_polyfit")
 X = poly.polyvander(hgt, n)
 c = np.dot(la.pinv(X), wgt)
 y = np.dot(poly.polyvander(x,n), c)
-plot_data_and_fit(hgt, wgt, x, y, "Reg_vandermonde")
+plot_data_and_fit(hgt, wgt, x, y, "Reg_vandermonde_pinv")
 
 # method 3: Regression using the Vandermonde matrix and lstsq
 X = poly.polyvander(hgt, n)
 c = la.lstsq(X, wgt)[0]
 y = np.dot(poly.polyvander(x,n), c)
-plot_data_and_fit(hgt, wgt, x, y, "Reg_lstsq")
+plot_data_and_fit(hgt, wgt, x, y, "Reg_vandermonde_lstsq")
 
 # method 4: Regression on transformed data using the Vandermonde
 # matrix and either pinv or lstsq
 X = poly.polyvander(trsf(hgt), n)
 c = np.dot(la.pinv(X), wgt)
 y = np.dot(poly.polyvander(trsf(x),n), c)
+plot_data_and_fit(hgt, wgt, x, y, "Reg_vandermonde_pinv_or_lstsq")
