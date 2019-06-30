@@ -22,20 +22,20 @@ if __name__ == "__main__":
     i=0
     while(i<10):
         start = time.time()
-        centroids, _ = kmeans(result, 3)  # assign each sample to a cluster
-        idx,_ = vq(result,centroids)
+        centroids, labels = kmeans(result, 3)  #assign each sample to cluster random
+        idx, _ = vq(result, centroids)
         end = time.time()
-        time_taken=end-start
+        time_taken = end - start
         t.append(time_taken)
-        i=i+1
+        i = i + 1
     print("time_taken")
-    print(sum(t)/len(t))
-
+    print(sum(t) / len(t))
 
     # some plotting using numpy's logical indexing
     plot(result[idx == 0, 0], result[idx == 0, 1], 'ob',
          result[idx == 1, 0], result[idx == 1, 1], 'or',
          result[idx == 2, 0], result[idx == 2, 1], 'og')  # third cluster points
     plot(centroids[:, 0], centroids[:, 1], 'sm', markersize=8)
+
+    savefig("Lloyd Clustering.pdf")
     show()
-    savefig("cluster_result.pdf")
