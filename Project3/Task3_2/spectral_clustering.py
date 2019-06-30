@@ -8,7 +8,7 @@ if __name__ == "__main__":
     X = np.loadtxt('data-clustering-2.csv', dtype=np.float, delimiter=',')
     X = X.T
 
-    beta = 4.0
+    beta = 1.0
     sim = np.empty((X.shape[0], X.shape[0]), dtype=np.float)
     diag = np.zeros((X.shape[0], X.shape[0]), dtype=np.float)
 
@@ -16,21 +16,23 @@ if __name__ == "__main__":
         sim[i,:] = np.exp(-1.0*beta*np.power(norm(X[i]-X, ord=2, axis=1),2))
         diag[i,i] = np.sum(sim[i,:])
 
+    # Calculating Laplacian
     L = diag - sim
 
-    # Sorting Eigen Values
+    # Sorting Eigen Values and Vectors
     w, v = eig(L)
     sorted_idxs = np.argsort(np.real(w))
     w, v = w[sorted_idxs], v[:, sorted_idxs]
 
-    # Fiedler Vector
+    # Fiedler Vector and clustering into {0,1} (represented in plot as {1,2})
     fv = v.T[1]
     y = (fv>0)*1
+    print(y)
 
     color_list = ['blue', 'red']
     plt.scatter(X[y == 0, 0], X[y == 0, 1], c='blue', label='Class 1', alpha=0.75)
     plt.scatter(X[y == 1, 0], X[y == 1, 1], c='red', label='Class 2', alpha=0.75)
-    plt.title("Spectral Clustering for 'data-clustering-2.csv'")
+    plt.title("Spectral Clustering for Beta = {}".format(beta))
     plt.savefig("spectral_clustering_Beta{}.pdf".format(beta), facecolor='w', edgecolor='w', papertype=None, format='pdf',
                 transparent=False, bbox_inches='tight', pad_inches=0.1)
     plt.legend()
