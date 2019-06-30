@@ -14,6 +14,9 @@ if __name__ == "__main__":
 
     C = np.dot(X,X.T)/y.shape[0]
     l, U = eig(C)
+    sorted_idxs = np.argsort(np.real(l))[::-1]
+    l, U = l[sorted_idxs], U[:, sorted_idxs]
+
 
     # 2D PCA Projections
     dim = 2

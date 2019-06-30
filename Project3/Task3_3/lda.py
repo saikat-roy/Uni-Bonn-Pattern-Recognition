@@ -9,9 +9,6 @@ if __name__ == "__main__":
     X = np.loadtxt('data-dimred-X.csv', dtype=np.float, delimiter=',')
     y = np.loadtxt('data-dimred-y.csv', dtype=np.float)
 
-    #X = X.T
-    # X = X-np.expand_dims(X.mean(axis=1),1)
-
     S_w = np.zeros((X.shape[0], X.shape[0]), dtype=np.float)
     S_b = np.zeros((X.shape[0], X.shape[0]), dtype=np.float)
     mu = np.expand_dims(np.mean(X,axis=1), 1)
@@ -25,7 +22,10 @@ if __name__ == "__main__":
         S_b = S_b + covar_cl_b
 
     l, U = eig(np.dot(np.linalg.pinv(S_w),S_b))
-    # exit()
+    sorted_idxs = np.argsort(np.real(l))[::-1]
+    # print(sorted_idxs)
+    l, U = l[sorted_idxs], U[:, sorted_idxs]
+
     # 2D Multiclass LDA Projections
     dim = 2
     X_trans = np.real(np.dot(U.T[0:dim], X))
@@ -42,9 +42,7 @@ if __name__ == "__main__":
     # 3D Multiclass LDA Projections
     dim = 3
     X_trans = np.real(np.dot(U.T[0:dim], X))
-    # print(X_trans)
-    # for i in range(X_trans.shape[1]):
-    #     print(X_trans[2,i])
+
     fig = plt.figure()
     ax = plt.axes(projection='3d')
     ax.scatter(X_trans[0, y == 1], X_trans[1, y == 1], X_trans[2, y == 1], c='red', label='Class 1', alpha=0.75)

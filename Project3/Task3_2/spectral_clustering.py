@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.linalg import norm, eig
+from numpy.linalg import norm, eig
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -13,30 +13,25 @@ if __name__ == "__main__":
     diag = np.zeros((X.shape[0], X.shape[0]), dtype=np.float)
 
     for i in range(X.shape[0]):
-        sim[i,:] = np.exp(-beta*norm(X[i]-X, ord=2, axis=1)**2)
+        sim[i,:] = np.exp(-1.0*beta*np.power(norm(X[i]-X, ord=2, axis=1),2))
         diag[i,i] = np.sum(sim[i,:])
 
     L = diag - sim
 
+    # Sorting Eigen Values
     w, v = eig(L)
-    print(w)
-    print(w.shape, v.shape)
+    sorted_idxs = np.argsort(np.real(w))
+    w, v = w[sorted_idxs], v[:, sorted_idxs]
 
-    sorted_idxs = np.argsort(w)
-    print(sorted_idxs)
-    print(w[sorted_idxs])
-    w, v = w[sorted_idxs], v[:,sorted_idxs]
-
-    fv = v[:,1]
-    print(fv)
+    # Fiedler Vector
+    fv = v.T[1]
     y = (fv>0)*1
-    print(y)
 
     color_list = ['blue', 'red']
     plt.scatter(X[y == 0, 0], X[y == 0, 1], c='blue', label='Class 1', alpha=0.75)
     plt.scatter(X[y == 1, 0], X[y == 1, 1], c='red', label='Class 2', alpha=0.75)
     plt.title("Spectral Clustering for 'data-clustering-2.csv'")
-    plt.savefig("spectral_clustering.pdf", facecolor='w', edgecolor='w', papertype=None, format='pdf',
+    plt.savefig("spectral_clustering_Beta{}.pdf".format(beta), facecolor='w', edgecolor='w', papertype=None, format='pdf',
                 transparent=False, bbox_inches='tight', pad_inches=0.1)
     plt.legend()
     plt.show()
