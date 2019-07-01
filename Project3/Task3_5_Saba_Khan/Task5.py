@@ -12,10 +12,10 @@ data = data[data[:,0]!='-1',:]
 hgt = data[:, 1].astype(np.float)
 wgt = data[:, 0].astype(np.float)
 
-xmin = hgt.min()-20
-xmax = hgt.max()+20
-ymin = wgt.min()-20
-ymax = wgt.max()+20
+xmin = hgt.min()-15
+xmax = hgt.max()+15
+ymin = wgt.min()-15
+ymax = wgt.max()+15
 
 def plot_data_and_fit(h, w, x, y, plt_name):
 	plt.plot(h, w, 'ko', x, y, 'r-')
